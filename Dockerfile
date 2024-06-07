@@ -7,8 +7,8 @@ FROM debian:trixie-slim AS builder
 RUN echo "===> Updating packages..." \
     && apt-get update -y
 
-RUN echo "===> Installing builder dependencies..." \
-    && buildDeps="build-essential \
+RUN echo "===> Installing dependencies..." \
+    && apt-get install -y build-essential \
     cmake \
     git \
     openssl \
@@ -22,8 +22,7 @@ RUN echo "===> Installing builder dependencies..." \
     zlib1g-dev \
     upx \
     doxygen \
-    graphviz" \
-    && apt-get install $buildDeps -y
+    graphviz
 
 # TODO: Allow cloning of specific version, this just takes master branch
 RUN echo "===> Cloning RetDec..." \
@@ -51,8 +50,10 @@ FROM debian:trixie-slim as runner
 
 LABEL maintainer "https://github.com/PhotonicGluon"
 
-RUN echo "===> Installing runner dependencies..."\
-    && apt-get update -y \
+RUN echo "===> Updating packages..." \
+    && apt-get update -y
+
+RUN echo "===> Installing dependencies..."\
     && apt-get install -y openssl graphviz upx python3
 
 RUN echo "===> Clean up files..." \
