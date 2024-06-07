@@ -2,7 +2,7 @@ name: Publish Image to GHCR
 
 on:
   push:
-    branches: ["release"]
+    branches: ["latest"]
 
 env:
   REGISTRY: ghcr.io
