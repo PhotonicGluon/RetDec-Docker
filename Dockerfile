@@ -70,8 +70,9 @@ RUN echo "===> Updating RetDec executable permissions..." \
     && chown retdec:retdec /usr/share/retdec \
     && du -sh /usr/share/retdec
 
-RUN echo "===> Updating RetDec share folder permissions..." \
-    && chmod -R 777 /usr/share/retdec/share/retdec
+RUN echo "===> Updating RetDec config file permissions..." \
+    && chmod 777 /usr/share/retdec/share/retdec/decompiler-config.json \
+    && chmod 777 /usr/share/retdec/share/retdec/fileinfo-config.json
 
 ENV PATH /usr/share/retdec/bin:$PATH
 
