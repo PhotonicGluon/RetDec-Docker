@@ -41,18 +41,17 @@ RUN echo "===> Installing RetDec..." \
     && cd /tmp/retdec/build \
     && make install
 
-#############
-# INTERFACE #
-#############
+RUN echo "===> Builder tasks complete!"
 
-FROM debian:trixie-slim as interfacer
+############
+#  RUNNER  #
+############
+
+FROM debian:trixie-slim as runner
 
 LABEL maintainer "https://github.com/PhotonicGluon"
 
-RUN groupadd --gid 1000 retdec \
-    && useradd -lm --uid 1000 --gid 1000 --home-dir /usr/share/retdec retdec
-
-RUN echo "===> Installing interfacer dependencies..."\
+RUN echo "===> Installing runner dependencies..."\
     && apt-get update -y \
     && apt-get install -y openssl graphviz upx python3
 
@@ -62,14 +61,21 @@ RUN echo "===> Clean up files..." \
 
 COPY --from=builder /usr/share/retdec /usr/share/retdec
 
+RUN echo "===> Creating RetDec user..." \
+    && groupadd --gid 1000 retdec \
+    && useradd -lm --uid 1000 --gid 1000 --home-dir /usr/share/retdec retdec
+
 RUN echo "===> Updating RetDec executable permissions..." \
-    && chown retdec:retdec /usr/share/retdec \ 
+    && chown retdec:retdec /usr/share/retdec \
     && du -sh /usr/share/retdec
+
+RUN echo "===> Updating RetDec share folder permissions..." \
+    && chmod -R 777 /usr/share/retdec/share/retdec
 
 ENV PATH /usr/share/retdec/bin:$PATH
 
 # Set up entry point
 USER retdec
 WORKDIR /samples
-ENTRYPOINT ["retdec-decompiler"]
-CMD ["--help"]
+
+RUN echo "===> Runner tasks complete!"
