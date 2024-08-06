@@ -2,13 +2,13 @@
 #  BUILDER  #
 #############
 
-FROM debian:trixie-slim AS builder
+FROM debian:bullseye-slim AS builder
 
 RUN echo "===> Updating packages..." \
-    && apt-get update -y
+    && apt-get -o "Acquire::https::Verify-Peer=false" update -y
 
 RUN echo "===> Installing dependencies..." \
-    && apt-get install -y build-essential \
+    && apt-get -o "Acquire::https::Verify-Peer=false" install -y build-essential \
     cmake \
     git \
     openssl \
@@ -20,14 +20,14 @@ RUN echo "===> Installing dependencies..." \
     pkg-config \
     m4 \
     zlib1g-dev \
-    upx \
+    upx-ucl \
     doxygen \
     graphviz
 
 # TODO: Allow cloning of specific version, this just takes master branch
 RUN echo "===> Cloning RetDec..." \
     && cd /tmp \
-    && git clone https://github.com/avast/retdec.git
+    && git -c http.sslVerify=false clone https://github.com/avast/retdec.git
 
 RUN echo "===> Building RetDec..."\
     && cd /tmp/retdec \
@@ -46,15 +46,15 @@ RUN echo "===> Builder tasks complete!"
 #  RUNNER  #
 ############
 
-FROM debian:trixie-slim as runner
+FROM debian:bullseye-slim AS runner
 
-LABEL maintainer "https://github.com/PhotonicGluon"
+LABEL maintainer="https://github.com/PhotonicGluon"
 
 RUN echo "===> Updating packages..." \
-    && apt-get update -y
+    && apt-get -o "Acquire::https::Verify-Peer=false" update -y
 
 RUN echo "===> Installing dependencies..."\
-    && apt-get install -y openssl graphviz upx python3
+    && apt-get -o "Acquire::https::Verify-Peer=false" install -y openssl graphviz upx-ucl python3
 
 RUN echo "===> Clean up files..." \
     && apt-get clean \
@@ -74,7 +74,7 @@ RUN echo "===> Updating RetDec config file permissions..." \
     && chmod 777 /usr/share/retdec/share/retdec/decompiler-config.json \
     && chmod 777 /usr/share/retdec/share/retdec/fileinfo-config.json
 
-ENV PATH /usr/share/retdec/bin:$PATH
+ENV PATH=/usr/share/retdec/bin:$PATH
 
 # Set up entry point
 USER retdec
